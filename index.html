@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Open DEVONthink Document</title>
+</head>
+<body>
+  <h2>Opening DEVONthink...</h2>
+  <p id="message">Attempting to open your document.</p>
+  <p><a id="openLink" href="#">Open document manually</a></p>
+
+  <script>
+    const id = decodeURIComponent(
+      window.location.hash.substring(1)
+    );
+
+    const valid = /^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$/.test(id);
+
+    if (valid) {
+      const url = "x-devonthink-item://" + id;
+      document.getElementById("openLink").href = url;
+      window.location.href = url;
+    } else {
+      document.getElementById("message").textContent =
+        "Invalid or missing DEVONthink document ID.";
+      document.getElementById("openLink").remove();
+    }
+  </script>
+</body>
+</html>
