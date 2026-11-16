@@ -1,31 +1,69 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Open DEVONthink Document</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reveal DEVONthink Document</title>
 </head>
 <body>
   <h2>Opening DEVONthink...</h2>
-  <p id="message">Attempting to open your document.</p>
-  <p><a id="openLink" href="#">Open document manually</a></p>
+  <p id="message">
+    Locating and selecting your document in DEVONthink.
+  </p>
+
+  <p>
+    <a id="openLink" href="#">
+      Reveal document manually
+    </a>
+  </p>
 
   <script>
-    const id = decodeURIComponent(
-      window.location.hash.substring(1)
-    );
+    // Read the document identifier from the URL fragment
+    const hash = window.location.hash.substring(1);
 
-    const valid = /^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$/.test(id);
+    // Remove any parameters after the identifier
+    const rawId = hash.split("?")[0];
 
-    if (valid) {
-      const url = "x-devonthink-item://" + id;
+    let id = "";
+
+    try {
+      id = decodeURIComponent(rawId);
+    } catch (error) {
+      id = "";
+    }
+
+    // Standard DEVONthink UUID
+    const validUUID =
+      /^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$/.test(id);
+
+    // DEVONthink email-message identifier
+    const validEmailID =
+      /^<[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+>$/.test(id);
+
+    if (validUUID || validEmailID) {
+
+      // Construct the native DEVONthink link
+      // Reveal the record rather than open a new window
+      const url =
+        "x-devonthink-item://" +
+        encodeURIComponent(id) +
+        "?reveal=1";
+
+      // Set the manual fallback link
       document.getElementById("openLink").href = url;
+
+      // Launch DEVONthink
       window.location.href = url;
+
     } else {
+
       document.getElementById("message").textContent =
         "Invalid or missing DEVONthink document ID.";
+
       document.getElementById("openLink").remove();
+
     }
   </script>
 </body>
 </html>
+
